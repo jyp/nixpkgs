@@ -137,5 +137,11 @@ in {
     sha256 = "1i4xrsqbad283qffvysn88w2pmxzxbbby41lw0j1113z771akv4w";
   };
 
+  cudatoolkit9 = common {
+    version = "9.0.176";
+    url = https://developer.nvidia.com/compute/cuda/9.0/Prod/local_installers/cuda_9.0.176_384.81_linux-run;
+    sha256 = "1i4xrsqbad283qffvysn88w2pmxzxbbby41lw0j1113z771akv4w";
+  };
+
 }
 
