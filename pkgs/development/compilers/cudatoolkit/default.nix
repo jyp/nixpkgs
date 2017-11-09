@@ -5,6 +5,15 @@
 
 let
 
+  patchedFloatn = stdenv.mkDerivation {
+    name = "cuda-floatn.h";
+
+    buildCommand = ''
+      mkdir -p $out/include/bits
+      sed 's,define __HAVE_FLOAT128 1,define __HAVE_FLOAT128 0,g' ${glibc.dev}/include/bits/floatn.h > $out/include/bits/floatn.h
+    '';
+  };
+
   common =
     args@{ gcc, version, sha256
     , url ? ""
@@ -109,12 +118,11 @@ let
         # Remove OpenCL libraries as they are provided by ocl-icd and driver.
         rm -f $out/lib64/libOpenCL*
 
-        # Set compiler for NVCC.
+        # Set compiler for NVCC and hacks to fix building against recent Glibc/GCC.
         wrapProgram $out/bin/nvcc \
-          --prefix PATH : ${gcc}/bin
-      '' + lib.optionalString (lib.versionOlder version "8.0") ''
-        # Hack to fix building against recent Glibc/GCC.
-        echo "NIX_CFLAGS_COMPILE+=' -D_FORCE_INLINES'" >> $out/nix-support/setup-hook
+          --prefix PATH : ${gcc}/bin \
+          ${lib.optionalString (lib.versionOlder version "8.0") "--prefix NIX_CFLAGS_COMPILE ' ' '-D_FORCE_INLINES'"} \
+          ${lib.optionalString (lib.versionOlder version "9.0") "--prefix NIX_CFLAGS_COMPILE ' ' '-isystem ${patchedFloatn}/include'"} \
       '';
 
       passthru = {
