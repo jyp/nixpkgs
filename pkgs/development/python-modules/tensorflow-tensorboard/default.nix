@@ -1,12 +1,10 @@
-{ stdenv
-, fetchPypi
-, buildPythonPackage
-, isPy3k
+{ stdenv, lib, fetchPypi, buildPythonPackage, isPy3k
 , bleach_1_5_0
 , numpy
 , werkzeug
 , protobuf
 , markdown
+, futures
 }:
 
 # tensorflow is built from a downloaded wheel, because the upstream
@@ -16,7 +14,7 @@
 
 buildPythonPackage rec {
   pname = "tensorflow-tensorboard";
-  version = "0.1.5";
+  version = "0.4.0rc2";
   name = "${pname}-${version}";
   format = "wheel";
 
@@ -26,13 +24,13 @@ buildPythonPackage rec {
     format = "wheel";
   } // (if isPy3k then {
     python = "py3";
-    sha256 = "0sfia05y1mzgy371faj96vgzhag1rgpa3gnbz9w1fay13jryw26x";
+    sha256 = "0cv9r2dqp0hy85qs7l2986ifdx86q98xxc5w6xyp6hnkz2h6jcim";
   } else {
     python = "py2";
-    sha256 = "0qx4f55zp54x079kxir4zz5b1ckiglsdcb9afz5wcdj6af4a6czg";
+    sha256 = "0n71frdcwl44birwxdrvjdjhhg87awwv6syy65d2a13ivw87nya0";
   }));
 
-  propagatedBuildInputs = [ bleach_1_5_0 numpy werkzeug protobuf markdown ];
+  propagatedBuildInputs = [ bleach_1_5_0 numpy werkzeug protobuf markdown ] ++ lib.optional (!isPy3k) futures;
 
   meta = with stdenv.lib; {
     description = "TensorFlow helps the tensors flow";
