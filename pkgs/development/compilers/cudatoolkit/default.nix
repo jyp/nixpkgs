@@ -100,12 +100,6 @@ let
             mv "$out"/cuda-samples "$out"/samples
         fi
 
-        # Change the #error on GCC > 4.9 to a #warning.
-        sed -i $out/include/host_config.h -e 's/#error\(.*unsupported GNU version\)/#warning\1/'
-
-        # Fix builds with newer glibc version
-        sed -i "1 i#define _BITS_FLOATN_H" "$out/include/host_defines.h"
-
         # Ensure that cmake can find CUDA.
         mkdir -p $out/nix-support
         echo "cmakeFlags+=' -DCUDA_TOOLKIT_ROOT_DIR=$out'" >> $out/nix-support/setup-hook
@@ -121,8 +115,7 @@ let
         # Set compiler for NVCC and hacks to fix building against recent Glibc/GCC.
         wrapProgram $out/bin/nvcc \
           --prefix PATH : ${gcc}/bin \
-          ${lib.optionalString (lib.versionOlder version "8.0") "--prefix NIX_CFLAGS_COMPILE ' ' '-D_FORCE_INLINES'"} \
-          ${lib.optionalString (lib.versionOlder version "9.0") "--prefix NIX_CFLAGS_COMPILE ' ' '-isystem ${patchedFloatn}/include'"} \
+          --prefix NIX_CFLAGS_COMPILE ' ' '${lib.concatStringsSep " " passthru.ccFlags}'
       '';
 
       passthru = {
@@ -130,6 +123,8 @@ let
         majorVersion =
           let versionParts = lib.splitString "." version;
           in "${lib.elemAt versionParts 0}.${lib.elemAt versionParts 1}";
+        ccFlags = lib.optional (lib.versionOlder version "8.0") "-D_FORCE_INLINES" ++
+                  lib.optional (lib.versionOlder version "9.0") "-isystem ${patchedFloatn}/include";
       };
 
       meta = with stdenv.lib; {
