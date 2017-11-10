@@ -22072,7 +22072,6 @@ EOF
   tensorflow-tensorboard = callPackage ../development/python-modules/tensorflow-tensorboard { };
 
   tensorflow = callPackage ../development/python-modules/tensorflow rec {
-    bazel = pkgs.bazel_0_4;
     cudaSupport = pkgs.config.cudaSupport or false;
     inherit (pkgs.linuxPackages) nvidia_x11;
     cudatoolkit = pkgs.cudatoolkit8;
