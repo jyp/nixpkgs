@@ -169,7 +169,8 @@ in {
     version = "8.0.61";
     url = "https://developer.nvidia.com/compute/cuda/8.0/Prod2/local_installers/cuda_8.0.61_375.26_linux-run";
     sha256 = "1i4xrsqbad283qffvysn88w2pmxzxbbby41lw0j1113z771akv4w";
-    gcc = gcc5;
+    # Fails in avx512vlintrin.h with gcc5
+    gcc = gcc49;
   };
 
   cudatoolkit9 = common {
