@@ -202,6 +202,8 @@ stdenv.mkDerivation rec {
     (opencvFlag "CUDA" enableCuda)
     (opencvFlag "CUBLAS" enableCuda)
   ] ++ lib.optionals enableCuda [
+    # Tests break on CUDA with GCC 4.9.
+    "-DBUILD_TESTS=OFF"
     "-DCUDA_FAST_MATH=ON"
     "-DCUDA_HOST_COMPILER=${cudatoolkit.cc}/bin/gcc"
   ] ++ lib.optionals buildContrib [
