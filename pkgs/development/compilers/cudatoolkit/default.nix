@@ -124,7 +124,7 @@ let
           let versionParts = lib.splitString "." version;
           in "${lib.elemAt versionParts 0}.${lib.elemAt versionParts 1}";
         ccFlags = lib.optional (lib.versionOlder version "8.0") "-D_FORCE_INLINES" ++
-                  lib.optional (lib.versionOlder version "9.0") "-isystem ${patchedFloatn}/include";
+                  [ "-isystem ${patchedFloatn}/include" ];
       };
 
       meta = with stdenv.lib; {
