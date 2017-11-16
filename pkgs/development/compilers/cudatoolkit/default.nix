@@ -115,7 +115,8 @@ let
         # Set compiler for NVCC and hacks to fix building against recent Glibc/GCC.
         wrapProgram $out/bin/nvcc \
           --prefix PATH : ${gcc}/bin \
-          --prefix NIX_CFLAGS_COMPILE ' ' '${lib.concatStringsSep " " passthru.ccFlags}'
+          --prefix NIX_CFLAGS_COMPILE ' ' '${lib.concatStringsSep " " passthru.ccFlags}' \
+          --add-flags '$NIX_NVCCFLAGS'
       '';
 
       passthru = {
