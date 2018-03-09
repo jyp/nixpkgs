@@ -21367,6 +21367,8 @@ EOF
   pysigset = callPackage ../development/python-modules/pysigset { };
 
   us = callPackage ../development/python-modules/us { };
+
+  dynet = callPackage ../development/python-modules/dynet { };
 });
 
 in fix' (extends overrides packages)
