@@ -6824,8 +6824,8 @@ in {
   tensorflow-bin_2 = callPackage ../development/python-modules/tensorflow/2/bin.nix {
     cudaSupport = pkgs.config.cudaSupport or false;
     inherit (pkgs.linuxPackages) nvidia_x11;
-    cudatoolkit = pkgs.cudatoolkit_10;
-    cudnn = pkgs.cudnn_cudatoolkit_10;
+    cudatoolkit = pkgs.cudatoolkit_10_1;
+    cudnn = pkgs.cudnn_cudatoolkit_10_1;
   };
 
   tensorflow-build = self.tensorflow-build_1;

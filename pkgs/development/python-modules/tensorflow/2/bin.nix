@@ -9,6 +9,7 @@
 , wrapt
 , numpy
 , six
+, astunparse
 , termcolor
 , protobuf
 , absl-py
@@ -19,7 +20,7 @@
 , opt-einsum
 , backports_weakref
 , tensorflow-estimator_2
-, tensorflow-tensorboard
+, tensorflow-tensorboard_2
 , cudaSupport ? false
 , cudatoolkit ? null
 , cudnn ? null
@@ -54,7 +55,7 @@ in buildPythonPackage {
   inherit (packages) version;
   format = "wheel";
 
-  disabled = isPy38;
+  disabled = ! isPy3k || isPy38;
 
   src = let
     pyVerNoDot = lib.strings.stringAsChars (x: if x == "." then "" else x) python.pythonVersion;
@@ -62,6 +63,10 @@ in buildPythonPackage {
     unit = if cudaSupport then "gpu" else "cpu";
     key = "${platform}_py_${pyVerNoDot}_${unit}";
   in fetchurl packages.${key};
+
+  buildInputs = [
+    tensorflow-tensorboard_2 # in propagatedBuildInputs it creates collisions
+  ];
 
   propagatedBuildInputs = [
     protobuf
@@ -73,11 +78,11 @@ in buildPythonPackage {
     astor
     absl-py
     gast
+    astunparse
     opt-einsum
     google-pasta
     wrapt
     tensorflow-estimator_2
-    tensorflow-tensorboard
     keras-applications
     keras-preprocessing
   ] ++ lib.optional (!isPy3k) mock
@@ -96,10 +101,10 @@ in buildPythonPackage {
     # Unpack the wheel file.
     wheel unpack --dest unpacked ./*.whl
 
-    # Tensorflow has a hard dependency on gast==0.2.2, but we relax it to
-    # gast==0.3.2.
-    substituteInPlace ./unpacked/tensorflow*/tensorflow_core/tools/pip_package/setup.py --replace "gast == 0.2.2" "gast == 0.3.2"
-    substituteInPlace ./unpacked/tensorflow*/tensorflow_*.dist-info/METADATA --replace "gast (==0.2.2)" "gast (==0.3.2)"
+    # Tensorflow has a hard dependency on scipy, but it does not actually depend on it
+    # https://github.com/tensorflow/tensorflow/issues/40884
+    substituteInPlace ./unpacked/tensorflow*/tensorflow/tools/pip_package/setup.py --replace "scipy == 1.4.1" "scipy >= 1.4.1"
+    substituteInPlace ./unpacked/tensorflow*/tensorflow_*.dist-info/METADATA --replace "scipy (==1.4.1)" "scipy (>=1.4.1)"
 
     # Pack the wheel file back up.
     wheel pack ./unpacked/tensorflow*
@@ -134,14 +139,14 @@ in buildPythonPackage {
       # TODO: Create this list programmatically, and remove paths that aren't
       # actually needed.
       rrPathArr=(
-        "$out/${python.sitePackages}/tensorflow_core/"
-        "$out/${python.sitePackages}/tensorflow_core/compiler/tf2tensorrt/"
-        "$out/${python.sitePackages}/tensorflow_core/compiler/tf2xla/ops/"
-        "$out/${python.sitePackages}/tensorflow_core/lite/experimental/microfrontend/python/ops/"
-        "$out/${python.sitePackages}/tensorflow_core/lite/python/interpreter_wrapper/"
-        "$out/${python.sitePackages}/tensorflow_core/lite/python/optimize/"
-        "$out/${python.sitePackages}/tensorflow_core/python/"
-        "$out/${python.sitePackages}/tensorflow_core/python/framework/"
+        "$out/${python.sitePackages}/tensorflow/"
+        "$out/${python.sitePackages}/tensorflow/compiler/tf2tensorrt/"
+        "$out/${python.sitePackages}/tensorflow/compiler/tf2xla/ops/"
+        "$out/${python.sitePackages}/tensorflow/lite/experimental/microfrontend/python/ops/"
+        "$out/${python.sitePackages}/tensorflow/lite/python/interpreter_wrapper/"
+        "$out/${python.sitePackages}/tensorflow/lite/python/optimize/"
+        "$out/${python.sitePackages}/tensorflow/python/"
+        "$out/${python.sitePackages}/tensorflow/python/framework/"
         "${rpath}"
       )
 
