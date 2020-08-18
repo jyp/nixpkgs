@@ -6812,6 +6812,8 @@ in {
 
   tensorflow-tensorboard_2 = callPackage ../development/python-modules/tensorflow-tensorboard/2 { };
 
+  tensorboard-plugin-wit = callPackage ../development/python-modules/tensorboard-plugin-wit { };
+
   tensorflow-bin = self.tensorflow-bin_1;
 
   tensorflow-bin_1 = callPackage ../development/python-modules/tensorflow/1/bin.nix {
